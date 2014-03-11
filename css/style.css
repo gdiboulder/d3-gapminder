@@ -1,0 +1,67 @@
+body {
+	padding: 0; 
+	margin: 10px;
+	width: 100%;
+	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	font-size: 14px;
+}
+
+circle {
+	opacity: 0.5;
+	cursor: pointer;
+}
+
+#year {
+	font-size: 60px;
+	text-align: right;
+	fill: #666;
+	font-weight: 100;
+}
+
+#hover {
+	position: absolute;
+	z-index: 1000;
+	background-color: #FFF;
+	border: 1px solid #DDD;
+	border-radius: 10px;
+	padding: 10px;
+	opacity: 0;
+	transition: opacity 0.25s;
+	pointer-events: none;
+}
+
+#hover > div {
+	padding-bottom: 5px;
+}
+
+#hover > div > span.value {
+	font-weight: bold;
+}
+
+.button {
+	position: relative;
+	left: 165px;
+	top: -62px;
+	margin: 20px;
+	padding: 5px 10px;
+	background-color: #EEE;
+	border: 1px solid #DDD;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.button:hover {
+	background-color: #DDD;
+	border: 1px solid #CCC;
+}
+
+.axis path, .axis line {
+	fill: none;
+	stroke: #999;
+	shape-rendering: crispEdges;
+}
+
+.axis text {
+	fill: #777;
+	font-size: 10px;
+}
