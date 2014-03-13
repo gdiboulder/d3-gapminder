@@ -6,6 +6,11 @@ body {
 	font-size: 14px;
 }
 
+h1 {
+	font-weight: 100;
+	margin: 10px 0 -10px 10px;
+}
+
 circle {
 	opacity: 0.5;
 	cursor: pointer;

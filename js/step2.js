@@ -5,68 +5,79 @@
 // Establish the namespace and set some properties to help organize the code
 var dv = {
 	axis: {},
-	data: {},
+	data: {
+		sub: [],
+		max: {}
+	},
 	draw: {},
 	format: {},
 	get: {},
 	html: {},
 	opt: {
-		h: 500,
-		w: 700
+		height: 500,
+		width: 700,
+		pad: 30,
+		radius: {
+			min: 5,
+			max: 50
+		},
+		fill: ['#0033CC', '#00CC33'],
+		countries: ['Afghanistan','Argentina','Bangladesh','Canada','China','Egypt','Ethiopia','Greece','India','Iran','Nigeria','Russia','Saudi Arabia','Singapore','South Africa','United Kingdom','United States','Vietnam'],
+		year: {
+			start: 1950,
+			end: 2012
+		},
+		speed: 750
 	},
 	setup: {},
 	scale: {},
-	state: {},
+	state: {
+		year: 1950
+	},
 	svg: {},
 	update: {}
 };
 
-/* SETUP */
+/* Step 1 Basic SVG */
 
-// Start here with any setup that can be done before/while the data is being processed
-dv.setup.start = function() {
-	dv.draw.main();
-	dv.get.data();
-};
-
-// Do these things once the data has been loaded
-dv.setup.withData = function() {
-	console.log(dv.data);
-};
-
-/* GET */
-
-// Collects the data
-dv.get.data = function() {
-	d3.csv('data/gdp.csv', function(error, data) {
-		dv.data.gdp = data;
-		dv.setup.withData();
-	});
-
-/* TO DO
-	Add a property to dv.get called countryData and set it equal to an anonymous function that accepts a path (e.g. 'data/life.csv') and a name (e.g. 'life') as arguments
-	Call that function a total of four times with the following arguments
-	path: 'data/gdp.csv', name: 'gdp'
-	path: 'data/life.csv', name: 'life'
-	path: 'data/population.csv', name: 'population'
-	path: 'data/fertility.csv', name: 'fertility'
-	Cleanup: remove the call above to d3.csv for the gdp withData
-	THE TRICKY PART: run dv.setup.withData just once, after all of the data is loaded
-*/
-
-};
-
-/* DRAW */
-
-// Main svg object
+// This is the main svg object
 dv.draw.main = function() {
 	dv.svg.main = d3.select('body').append('svg:svg')
-		.attr('width', dv.opt.w)
-		.attr('height', dv.opt.h)
+		.attr('width', dv.opt.width)
+		.attr('height', dv.opt.height)
 	;
 };
 
-/* UPDATE */
+/* Step 2 Getting Data
+	// Using the d3.csv function, get the data from 'data/gdp.csv'
+	// Create a new variable 'myData' and set it equal to the data retrieved by the d3.csv function
+	// Set dv.data.gdp equal to the data
+	// console.log dv.data.gdp and myData inside the d3.csv function
+	// console.log dv.data.gdp and myData outside and after the d3.csv function
 
-/* START */
-dv.setup.start();
+dv.get.data = function() {
+	d3.csv('SOME PATH', function(error, data) {
+		var myData = SOME ARGUMENT;
+		dv.data.gdp = SOME ARGUMENT;
+		console.log('I am inside the d3.csv function.')
+		console.log(THE DV VARIABLE);
+		console.log(MY VARIABLE);
+	});
+	console.log('I am outside the d3.csv function.')
+	console.log(THE DV VARIABLE);
+	console.log(MY VARIABLE);
+};
+
+*/
+
+//  Keep this stuff at the bottom of the file, we'll be updating it periodically
+
+// This is all of the stuff we can do before we even have the data
+dv.setup.withoutData = function() {
+	dv.draw.main();
+	// ADD AND UN-COMMENT ME!  I'M NEW!
+	// dv.get.data();
+};
+
+// This kicks everything off
+dv.setup.withoutData();

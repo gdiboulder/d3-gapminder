@@ -2,137 +2,153 @@
 
 /* jshint devel:true */
 
-/* TO DO
-	Replace dv with the following:
-	var dv = {
-		axis: {},
-		data: {
-			sub: [],
-			max: {}
-		},
-		draw: {},
-		format: {},
-		get: {},
-		html: {},
-		opt: {
-			h: 500,
-			w: 700,
-			pad: 30,
-			r: {
-				min: 5,
-				max: 50
-			},
-			fill: ["#0033CC", "#00CC33"],
-			countries: ["Afghanistan","Argentina","Bangladesh","Canada","China","Egypt","Ethiopia","Greece","India","Iran","Nigeria","Russia","Saudi Arabia","Singapore","South Africa","United Kingdom","United States","Vietnam"],
-			year: {
-				start: 1950,
-				end: 2012
-			},
-			speed: 750
-		},
-		setup: {},
-		scale: {},
-		state: {
-			year: 1950
-		},
-		svg: {},
-		update: {}
-	};
-*/
-
 // Establish the namespace and set some properties to help organize the code
 var dv = {
 	axis: {},
-	data: {},
+	data: {
+		sub: [],
+		max: {}
+	},
 	draw: {},
 	format: {},
 	get: {},
 	html: {},
 	opt: {
-		w: 800,
-		h: 600
+		height: 500,
+		width: 700,
+		pad: 30,
+		radius: {
+			min: 5,
+			max: 50
+		},
+		fill: ['#0033CC', '#00CC33'],
+		countries: ['Afghanistan','Argentina','Bangladesh','Canada','China','Egypt','Ethiopia','Greece','India','Iran','Nigeria','Russia','Saudi Arabia','Singapore','South Africa','United Kingdom','United States','Vietnam'],
+		year: {
+			start: 1950,
+			end: 2012
+		},
+		speed: 750
 	},
 	setup: {},
 	scale: {},
-	state: {},
+	state: {
+		year: 1950
+	},
 	svg: {},
 	update: {}
 };
 
-/* SETUP */
+/* Step 1 Basic SVG */
 
-// Start here with any setup that can be done before/while the data is being processed
-dv.setup.start = function() {
-	dv.draw.main();
-	dv.get.data();
+// This is the main svg object
+dv.draw.main = function() {
+	dv.svg.main = d3.select('body').append('svg:svg')
+		.attr('width', dv.opt.width)
+		.attr('height', dv.opt.height)
+	;
 };
 
-// Do these things once the data has been loaded
+/* Step 2 Getting Data */
+dv.get.data = function() {
+	d3.csv('data/gdp.csv', function(error, data) {
+		var myData = data;
+		dv.data.gdp = data;
+		console.log('I am inside the d3.csv function.');
+		console.log(dv.data.gdp);
+		console.log(myData);
+	});
+	console.log('I am outside the d3.csv function.');
+	console.log(dv.data.gdp);
+	console.log(myData);
+};
+
+/* Step 3 Getting Lots of Data
+	// 1. Comment out your first dv.get.data function (above)
+	// Given the asynchronous nature of the data calls, one solution to getting data from multiple sources is to chain the calls together
+	// 2. Create a separate function to get data from each of the following sources
+	//	PATH					NAME
+	//	'data/gdp.csv'			'gdp'
+	//	'data/life.csv'			'life'
+	//	'data/population.csv'	'population'
+	//	'data/fertility.csv'	'fertility'
+
+	// Make a call to dv.setup.massage, passing the data and the 'name' of the data
+	// Call the next function at the end of the previous function
+	// Call dv.setup.withData at the end of the last function
+	// Call the first function from dv.get.data
+
+dv.get.data() {
+	dv.get.FIRST-NAME();	
+};
+
+dv.get.FIRST-NAME = function() {
+	d3.csv('SOME PATH', function(error, data) {
+		dv.setup.massage(DATA ARGUMENT, 'DATA NAME');
+		dv.get.NEXT-NAME();
+	});
+};
+
+dv.get.NEXT-NAME = function() {
+	d3.csv('SOME PATH', function(error, data) {
+		dv.setup.massage(DATA ARGUMENT, 'DATA NAME');
+		dv.get.NEXT-NAME();
+	});
+};
+
+dv.get.NEXT-NAME = function() {
+	d3.csv('SOME PATH', function(error, data) {
+		dv.setup.massage(DATA ARGUMENT, 'DATA NAME');
+		dv.get.LAST-NAME();
+	});
+};
+
+dv.get.LAST-NAME = function() {
+	d3.csv('SOME PATH', function(error, data) {
+		dv.setup.massage(DATA ARGUMENT, 'DATA NAME');
+		dv.get.withData();
+	});
+};
+
+*/
+
+// ADD ME!  I'M NEW!
+// Merges the data into a single array, cleans and converts csv strings to numbers, finds maximum values, restricts the data to the countries and time frame specified in dv.opt
+dv.setup.massage = function(data, name) {
+	var i;
+	if (dv.data.sub.length === 0) {
+		for (i = 0; i < dv.opt.countries.length; i++) {
+			dv.data.sub[i] = { name: dv.opt.countries[i] };
+		}
+	}
+	dv.data.max[name] = 0;
+	for (i = 0; i < data.length; i++) {
+		var country = data[i];
+		var index = dv.opt.countries.indexOf(country.name);
+		if (index !== -1) {
+			dv.data.sub[index][name] = {};
+			for (var year = dv.opt.year.start; year <= dv.opt.year.end; year++) {
+				var value = Number(country[year].replace(/,/g,''));
+				dv.data.sub[index][name][year] = value;
+				if (value > dv.data.max[name]) { dv.data.max[name] = value; }
+			}
+		}
+	}
+};
+
+
+//  Keep this stuff at the bottom of the file, we'll be updating it periodically
+
+// LOOK AT ME!  I'M NEW!
+// This is all of the stuff we can only do AFTER we have the data 
 dv.setup.withData = function() {
 	console.log(dv.data);
 };
 
-/* GET */
-
-// Collects the data
-dv.get.data = function() {
-	dv.state.loading = 4;
-	/* TO DO
-		For each item in the dv.opt.countries array, add a property to the dv.data.sub object and set the value to an array, with a single property of 'name' and set that equal to the country name
-		Hint:
-			for (var i = length of dv.opt.countries - 1; i >= 0; i--) {
-				dv.data.sub[i] = { name: the current item in dv.opt.countries};
-			}
-	*/
-
-	dv.get.countryData({path: 'data/gdp.csv', name: 'gdp'});
-	dv.get.countryData({path: 'data/life.csv', name: 'life'});
-	dv.get.countryData({path: 'data/population.csv', name: 'population'});
-	dv.get.countryData({path: 'data/fertility.csv', name: 'fertility'});
+// This is all of the stuff we can do before we even have the data
+dv.setup.withoutData = function() {
+	dv.draw.main();
+	dv.get.data();
 };
 
-// expects opt.path and opt.name, adds the data to the dv.data object
-dv.get.countryData = function(opt) {
-	d3.csv(opt.path, function(error, data) {
-		/* TO DO
-			Go through each item in the data array, add only those countries and years specified in dv.opt to the dv.data.sub array
-			Convert all of the numeric values to numbers (remove commas, convert from string to number)
-			Figure out the maximum value for each data set
-			NOTE: I wasn't kidding about this taking forever to work out. So feel free to attempt it on your own, or spend the time to try to understand my solution below.  It probably isn't most elegant solution, but it gets the job done.
-			SPOILER ALERT: 
-				dv.data.max[opt.name] = 0;
-				for (var i = data.length - 1; i >= 0; i--) {
-					var country = data[i];
-					var index = dv.opt.countries.indexOf(country.name);
-					if (index !== -1) {
-						dv.data.sub[index][opt.name] = {};
-						for (var year = dv.opt.year.start; year <= dv.opt.year.end; year++) {
-							var value = Number(country[year].replace(/,/g,''));
-							dv.data.sub[index][opt.name][year] = value;
-							if (value > dv.data.max[opt.name]) { dv.data.max[opt.name] = value; }
-						}
-					}
-				}
-		*/
-
-		dv.data[opt.name] = data;
-		dv.state.loading--;
-		if (dv.state.loading === 0) { dv.setup.withData(); }
-	});
-};
-
-
-/* DRAW */
-
-// Main svg object
-dv.draw.main = function() {
-	dv.svg.main = d3.select('body').append('svg:svg')
-		.attr('width', dv.opt.w)
-		.attr('height', dv.opt.h)
-	;
-};
-
-/* UPDATE */
-
-/* START */
-dv.setup.start();
+// This kicks everything off
+dv.setup.withoutData();
